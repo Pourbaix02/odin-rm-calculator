@@ -1,6 +1,6 @@
 import './App.css'
 import { useState, useMemo } from 'react'
-import { Scale, Percent, Dumbbell } from 'lucide-react'
+import { Scale, Percent, Dumbbell, Plus, Minus, Trash2, Calculator } from 'lucide-react'
 import odinLogo from './assets/logo-odin.png'
 
 // Discos disponibles (libras grandes, kilogramos pequeños)
@@ -20,10 +20,16 @@ const BAR_WEIGHTS_KG = {
 }
 
 export default function App() {
+  const [activeTab, setActiveTab] = useState('calculator') // 'calculator' o 'builder'
   const [rm, setRm] = useState('')
   const [unit, setUnit] = useState('kg')
   const [percentage, setPercentage] = useState(75)
   const [barType, setBarType] = useState('hombre')
+  
+  // Estados para el constructor de barra manual
+  const [manualPlatesLb, setManualPlatesLb] = useState([])
+  const [manualPlatesKg, setManualPlatesKg] = useState([])
+  const [manualBarType, setManualBarType] = useState('hombre')
 
   // Calcular peso objetivo en kg
   const targetWeight = useMemo(() => {
@@ -76,6 +82,35 @@ export default function App() {
     return BAR_WEIGHTS_KG[barType] + platesWeightLb + platesWeightKg
   }, [plateDistribution, barType])
 
+  // Funciones para el constructor de barra manual
+  const addManualPlate = (plate, type) => {
+    if (type === 'lb') {
+      setManualPlatesLb([...manualPlatesLb, plate])
+    } else {
+      setManualPlatesKg([...manualPlatesKg, plate])
+    }
+  }
+
+  const removeManualPlate = (index, type) => {
+    if (type === 'lb') {
+      setManualPlatesLb(manualPlatesLb.filter((_, i) => i !== index))
+    } else {
+      setManualPlatesKg(manualPlatesKg.filter((_, i) => i !== index))
+    }
+  }
+
+  const clearManualPlates = () => {
+    setManualPlatesLb([])
+    setManualPlatesKg([])
+  }
+
+  // Calcular peso total de la barra manual (en kg)
+  const manualTotalWeight = useMemo(() => {
+    const platesWeightLb = manualPlatesLb.reduce((sum, p) => sum + (p / 2.20462), 0) * 2 // x2 para ambos lados
+    const platesWeightKg = manualPlatesKg.reduce((sum, p) => sum + p, 0) * 2 // x2 para ambos lados
+    return BAR_WEIGHTS_KG[manualBarType] + platesWeightLb + platesWeightKg
+  }, [manualPlatesLb, manualPlatesKg, manualBarType])
+
   return (
     <div className="app">
       <header className="header">
@@ -84,13 +119,31 @@ export default function App() {
             <img src={odinLogo} alt="Odin Fitness Logo" className="logo" />
           </div>
           <div className="brand-text">
-            <h1 className="title">Calculadora de RM</h1>
+            <h1 className="title">Calculadora de CrossFit</h1>
             <p className="subtitle">Odin Fitness</p>
           </div>
         </div>
       </header>
 
+      <div className="tabs-container">
+        <button
+          className={`tab-button ${activeTab === 'calculator' ? 'active' : ''}`}
+          onClick={() => setActiveTab('calculator')}
+        >
+          <Calculator size={18} />
+          Calculadora %RM
+        </button>
+        <button
+          className={`tab-button ${activeTab === 'builder' ? 'active' : ''}`}
+          onClick={() => setActiveTab('builder')}
+        >
+          <Dumbbell size={18} />
+          Constructor de Barra
+        </button>
+      </div>
+
       <main className="main-content">
+        {activeTab === 'calculator' && (
         <div className="calculator">
           <div className="form">
             <div className="rm-input-group">
@@ -253,6 +306,168 @@ export default function App() {
             )}
           </div>
         </div>
+        )}
+        
+        {activeTab === 'builder' && (
+        <div className="manual-builder">
+          <div className="manual-builder-header">
+            <h2 className="manual-builder-title">
+              <Dumbbell size={20} />
+              Constructor de Barra
+            </h2>
+            <p className="manual-builder-subtitle">
+              Arma tu barra personalizada eligiendo los discos para un lado
+            </p>
+          </div>
+
+          <div className="manual-controls">
+            <div className="control-group">
+              <label className="label">
+                <Scale size={16} />
+                Tipo de barra
+              </label>
+              <div className="bar-type-selector">
+                <button
+                  className={`bar-btn ${manualBarType === 'hombre' ? 'active' : ''}`}
+                  onClick={() => setManualBarType('hombre')}
+                >
+                  Hombre (45 lb)
+                </button>
+                <button
+                  className={`bar-btn ${manualBarType === 'mujer' ? 'active' : ''}`}
+                  onClick={() => setManualBarType('mujer')}
+                >
+                  Mujer (35 lb)
+                </button>
+              </div>
+            </div>
+
+            <div className="plate-selector-section">
+              <h4 className="plate-selector-title">Discos de Libras (lb)</h4>
+              <div className="plate-selector-buttons">
+                {PLATES_LB.map((plate) => (
+                  <button
+                    key={plate}
+                    className={`plate-selector-btn plate-lb-${plate}`}
+                    onClick={() => addManualPlate(plate, 'lb')}
+                  >
+                    <Plus size={16} />
+                    {plate} lb
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="plate-selector-section">
+              <h4 className="plate-selector-title">Discos de Kilogramos (kg)</h4>
+              <div className="plate-selector-buttons">
+                {PLATES_KG.map((plate) => (
+                  <button
+                    key={plate}
+                    className={`plate-selector-btn plate-kg-${plate}`}
+                    onClick={() => addManualPlate(plate, 'kg')}
+                  >
+                    <Plus size={16} />
+                    {plate} kg
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="manual-result">
+            <div className="manual-weight-display">
+              <div className="manual-weight-label">Peso Total</div>
+              <div className="manual-weight-value">
+                {manualTotalWeight.toFixed(1)} kg
+              </div>
+              <div className="manual-weight-sublabel">
+                {(manualTotalWeight * 2.20462).toFixed(1)} lb
+              </div>
+            </div>
+
+            {(manualPlatesLb.length > 0 || manualPlatesKg.length > 0) && (
+              <button className="clear-btn" onClick={clearManualPlates}>
+                <Trash2 size={16} />
+                Limpiar
+              </button>
+            )}
+          </div>
+
+          <div className="manual-bar-visualization">
+            <h4 className="visualization-title">Vista de la barra (un lado)</h4>
+            <div className="bar-visualization">
+              <div className="bar-container-single">
+                <div className="bar-left">
+                  <div className="bar-sleeve-left"></div>
+                  <div className="bar-grip-single">
+                    {BAR_WEIGHTS_LB[manualBarType]} lb
+                  </div>
+                </div>
+                
+                <div className="bar-plates">
+                  {manualPlatesLb.map((plate, i) => (
+                    <div 
+                      key={`manual-lb-${i}`} 
+                      className={`plate plate-lb plate-${plate} clickable`}
+                      onClick={() => removeManualPlate(i, 'lb')}
+                      title="Click para remover"
+                    >
+                      <div className="plate-remove-icon">
+                        <Minus size={12} />
+                      </div>
+                      {plate}
+                    </div>
+                  ))}
+                  {manualPlatesKg.map((plate, i) => (
+                    <div 
+                      key={`manual-kg-${i}`} 
+                      className={`plate plate-kg plate-kg-${plate} clickable`}
+                      onClick={() => removeManualPlate(i, 'kg')}
+                      title="Click para remover"
+                    >
+                      <div className="plate-remove-icon">
+                        <Minus size={12} />
+                      </div>
+                      {plate}
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="bar-sleeve-right"></div>
+              </div>
+            </div>
+
+            {(manualPlatesLb.length > 0 || manualPlatesKg.length > 0) && (
+              <div className="manual-plate-list">
+                <h4>Discos en un lado:</h4>
+                <ul>
+                  {manualPlatesLb.length > 0 && (
+                    <li>
+                      Discos lb: {manualPlatesLb.join(' lb, ')} lb
+                    </li>
+                  )}
+                  {manualPlatesKg.length > 0 && (
+                    <li>
+                      Discos kg: {manualPlatesKg.join(' kg, ')} kg
+                    </li>
+                  )}
+                </ul>
+                <p className="manual-note">
+                  * Los discos se duplican en ambos lados de la barra para el peso total
+                </p>
+              </div>
+            )}
+
+            {manualPlatesLb.length === 0 && manualPlatesKg.length === 0 && (
+              <div className="empty-state">
+                <Dumbbell size={40} opacity={0.3} />
+                <p>Agrega discos usando los botones de arriba</p>
+              </div>
+            )}
+          </div>
+        </div>
+        )}
       </main>
 
       <footer className="footer">Hecho con ❤️ en Odin Fitness</footer>
