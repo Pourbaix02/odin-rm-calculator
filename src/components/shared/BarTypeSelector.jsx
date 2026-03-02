@@ -1,21 +1,30 @@
-import { Scale } from 'lucide-react'
+import { User } from 'lucide-react'
 import { BAR_WEIGHTS_KG } from '../../constants/weights'
 
-export default function BarTypeSelector({ value, onChange, label = 'Tipo de barra' }) {
+const OPTIONS = [
+  { key: 'hombre', label: 'Hombre' },
+  { key: 'mujer', label: 'Mujer' },
+]
+
+export default function BarTypeSelector({ value, onChange }) {
   return (
-    <div className="control-group">
-      <label className="label">
-        <Scale size={16} />
-        {label}
-      </label>
-      <div className="bar-type-selector">
-        <button className={`bar-btn ${value === 'hombre' ? 'active' : ''}`} onClick={() => onChange('hombre')}>
-          Hombre ({BAR_WEIGHTS_KG.hombre} kg)
-        </button>
-        <button className={`bar-btn ${value === 'mujer' ? 'active' : ''}`} onClick={() => onChange('mujer')}>
-          Mujer ({BAR_WEIGHTS_KG.mujer} kg)
-        </button>
-      </div>
+    <div className="bar-type-row">
+      {OPTIONS.map((opt) => {
+        const active = value === opt.key
+        return (
+          <button
+            key={opt.key}
+            className={`bar-type-option ${active ? 'active' : ''}`}
+            onClick={() => onChange(opt.key)}
+          >
+            <div className={`bar-type-icon-circle ${active ? 'active' : ''}`}>
+              <User size={20} />
+            </div>
+            <span className="bar-type-label">{opt.label}</span>
+            <span className="bar-type-weight">{BAR_WEIGHTS_KG[opt.key]} kg</span>
+          </button>
+        )
+      })}
     </div>
   )
 }
