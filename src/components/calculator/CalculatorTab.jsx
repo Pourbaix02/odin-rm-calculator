@@ -90,6 +90,15 @@ export default function CalculatorTab({
                   <Percent size={16} />
                   Elige intensidad: {percentage}%
                 </label>
+                <input
+                  type="range"
+                  min="30"
+                  max="100"
+                  step="1"
+                  value={percentage}
+                  onChange={(event) => setPercentage(Number(event.target.value))}
+                  className="slider"
+                />
                 <div className="percentage-buttons">
                   {[50, 60, 70, 75, 80, 85, 90, 95, 100].map((value) => (
                     <button

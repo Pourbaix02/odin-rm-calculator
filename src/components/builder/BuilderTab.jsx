@@ -1,4 +1,5 @@
-import { Dumbbell, Trash2, Weight, XCircle } from 'lucide-react'
+import { Check, Clipboard, Dumbbell, Trash2, Weight, XCircle } from 'lucide-react'
+import { useState } from 'react'
 import { BAR_WEIGHTS_KG, KG_TO_LB, LB_TO_KG, PLATES_KG, PLATES_LB } from '../../constants/weights'
 import useAnimatedNumber from '../../hooks/useAnimatedNumber'
 import BarTypeSelector from '../shared/BarTypeSelector'
@@ -29,8 +30,17 @@ export default function BuilderTab({
   removeManualPlate,
   clearManualPlates,
 }) {
+  const [copied, setCopied] = useState(false)
   const hasPlates = manualPlatesLb.length > 0 || manualPlatesKg.length > 0
   const animatedTotal = useAnimatedNumber(manualTotalWeight)
+
+  const copyTotal = () => {
+    const text = `${manualTotalWeight.toFixed(1)} kg (${(manualTotalWeight * KG_TO_LB).toFixed(1)} lb)`
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    })
+  }
   const perSideKg =
     manualPlatesLb.reduce((s, p) => s + p * LB_TO_KG, 0) +
     manualPlatesKg.reduce((s, p) => s + p, 0)
@@ -104,6 +114,13 @@ export default function BuilderTab({
             <span className="weight-strip-unit">kg</span>
             <span className="weight-strip-sep">·</span>
             <span className="weight-strip-secondary">{(animatedTotal * KG_TO_LB).toFixed(1)} lb</span>
+            <button
+              className={`copy-btn ${copied ? 'copied' : ''}`}
+              onClick={copyTotal}
+            >
+              {copied ? <Check size={14} /> : <Clipboard size={14} />}
+              {copied ? 'Copiado' : 'Copiar'}
+            </button>
           </div>
           {hasPlates && (
             <button className="clear-btn-compact" onClick={clearManualPlates}>
