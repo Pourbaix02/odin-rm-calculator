@@ -1,24 +1,27 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+:root {
+  --bg: #101113;
+  --stage: #141f38;
+  --surface: #1a1c20;
+  --line: #30343b;
+  --text: #f2f2ee;
+  --muted: #a3a7af;
+  --accent: #c8f031;
+  --ink: #14160a;
+
+  color-scheme: dark;
+  font-family: 'Barlow', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
 
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-}
-
-:root {
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background: #0c0d14;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
 }
 
 *,
@@ -29,43 +32,23 @@ html {
 
 body {
   margin: 0;
-  min-height: 100vh;
   min-height: 100dvh;
-  width: 100%;
+  background: var(--bg);
   overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
 }
 
-#root {
-  width: 100%;
-  min-height: 100vh;
-  min-height: 100dvh;
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: rgba(15, 23, 42, 0.6);
-  cursor: pointer;
-  transition: border-color 0.25s;
-  -webkit-tap-highlight-color: transparent;
+a {
+  color: inherit;
 }
 
-input, select, textarea {
-  font-size: 16px;
-  -webkit-tap-highlight-color: transparent;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #1e293b;
-    background: #f1f5f9;
-  }
-  button {
-    background-color: #f9f9f9;
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 }
